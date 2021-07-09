@@ -7,7 +7,9 @@ const {auth} =require('./middlewares/auth');
 const Product = require('./models/product');
 const product = require('./models/product');
 const db=require('./config/config').get(process.env.NODE_ENV);
+const { Kafka } = require('kafkajs');
 const app=express();
+const readMessage ="";
 // app use
 app.use(bodyparser.urlencoded({extended : false}));
 app.use(bodyparser.json());
@@ -23,20 +25,59 @@ mongoose.connect(db.DATABASE,{ useNewUrlParser: true,useUnifiedTopology:true },f
 
 // adding new user (sign-up route)
 app.post('/api/register',function(req,res){
-   // taking a user
-   const newuser=new User(req.body);
-   console.log(newuser);
-   User.findOne({email:newuser.email},function(err,user){
-       if(user) return res.status(400).json({ auth : false, message :"email exits"});
-       newuser.save((err,doc)=>{
-           if(err) {console.log(err);
-               return res.status(400).json({ success : false});}
-           res.status(200).json({
-               succes:true,
-               user : doc
-           });
-       });
-   });
+
+
+
+
+  const kafka = new Kafka({
+    clientId: "test-app",
+    brokers: ["localhost:9092"],
+  });
+  
+  const consumer = kafka.consumer({ groupId: "test-group" });
+  const run = async () => {
+    await consumer.connect();
+    await consumer.subscribe({ topic: "test", fromBeginning: true });
+
+    console.log("aaaa");
+    console.log("fsdghj");
+     readMessage = async function (message) {
+    await consumer.run({
+      eachMessage: async ({ topic, partition, message }) => {
+        console.log("Received: ", {
+          partition,
+          offset: message.offset,
+          value: message.value.toString(),
+        });
+      },
+    });
+  };
+  }
+res.send({
+  "readMessage":readMessage
+})
+  //readMessage();
+// console.log(readMessage,"yes");
+
+
+
+
+
+
+  //  // taking a user
+  //  const newuser=new User(req.body);
+  //  console.log(newuser);
+  //  User.findOne({email:newuser.email},function(err,user){
+  //      if(user) return res.status(400).json({ auth : false, message :"email exits"});
+  //      newuser.save((err,doc)=>{
+  //          if(err) {console.log(err);
+  //              return res.status(400).json({ success : false});}
+  //          res.status(200).json({
+  //              succes:true,
+  //              user : doc
+  //          });
+  //      });
+  //  });
 });
 
 
