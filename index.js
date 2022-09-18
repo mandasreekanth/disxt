@@ -3,7 +3,8 @@ const mongoose= require('mongoose');
 const bodyparser=require('body-parser');
 const cookieParser=require('cookie-parser');
 const Netflix = require('./models/netflix');
-const db=require('./config/config').get(process.env.NODE_ENV);
+const db=require('./config/config')
+//.get(process.env.NODE_ENV);
 const app=express();
 // app use
 app.use(bodyparser.urlencoded({extended : false}));
