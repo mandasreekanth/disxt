@@ -21,4 +21,7 @@ for installing the above packages you have to run the below command
 
     $ yarn build
 
-use node index to start the port :
+use node index to start the port :3000 
+
+use npm start 
+
